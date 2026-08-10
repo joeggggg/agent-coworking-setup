@@ -1,0 +1,60 @@
+{
+  "_comment": "Rename to settings.json after trimming. Never commit a settings.json with literal secrets — mcpServers below reference ${ENV_VARS} only.",
+  "model": "sonnet",
+  "effortLevel": "high",
+  "theme": "dark",
+  "autoUpdatesChannel": "latest",
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "productivity@knowledge-work-plugins": true,
+    "product-management@knowledge-work-plugins": true,
+    "data@knowledge-work-plugins": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "knowledge-work-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/knowledge-work-plugins"
+      }
+    }
+  },
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "WebFetch",
+    "Bash(git *)",
+    "Bash(node *)",
+    "Bash(npm *)"
+  ],
+  "mcpServers": {
+    "_comment": "Delete any server you don't use. Set each env var in your shell/profile, never inline.",
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github@latest"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "@figma/mcp-server@latest"],
+      "env": { "FIGMA_PERSONAL_ACCESS_TOKEN": "${FIGMA_TOKEN}" }
+    },
+    "notion": {
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server@latest"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${NOTION_TOKEN}\", \"Notion-Version\": \"2022-06-28\"}"
+      }
+    }
+  },
+  "permissions": {
+    "allow": []
+  }
+}
