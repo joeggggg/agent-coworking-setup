@@ -1,5 +1,6 @@
 {
-  "_comment": "Rename to settings.json after trimming. Never commit a settings.json with literal secrets — mcpServers below reference ${ENV_VARS} only.",
+  "_comment": "Rename to settings.json after trimming. Never commit a settings.json with literal secrets.",
+  "_mcpServers": "Intentionally omitted from this template. MCP servers (GitHub/Figma/Notion/etc.) reach real external endpoints once configured with real tokens — set them up fresh on each new machine rather than carrying config across, so you consciously choose what this environment is allowed to reach and with which credentials. Add a top-level \"mcpServers\" object here (see Claude Code docs) only for servers this specific environment actually needs.",
   "model": "sonnet",
   "effortLevel": "high",
   "theme": "dark",
@@ -34,26 +35,6 @@
     "Bash(node *)",
     "Bash(npm *)"
   ],
-  "mcpServers": {
-    "_comment": "Delete any server you don't use. Set each env var in your shell/profile, never inline.",
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github@latest"],
-      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
-    },
-    "figma": {
-      "command": "npx",
-      "args": ["-y", "@figma/mcp-server@latest"],
-      "env": { "FIGMA_PERSONAL_ACCESS_TOKEN": "${FIGMA_TOKEN}" }
-    },
-    "notion": {
-      "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server@latest"],
-      "env": {
-        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${NOTION_TOKEN}\", \"Notion-Version\": \"2022-06-28\"}"
-      }
-    }
-  },
   "permissions": {
     "allow": []
   }

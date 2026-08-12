@@ -24,7 +24,7 @@ agent-coworking-setup/
 ├── .claude/                           # Claude Code
 │   ├── CLAUDE.md                      # Full persona — dual mode, output conventions [CUSTOMIZE]
 │   ├── commands/                      # /explain /feature /init-spec-project /quality-gate
-│   └── settings.template.json         # Plugins, MCP servers (env-var refs), model prefs
+│   └── settings.template.json         # Plugins, model prefs (MCP servers deliberately not included — see below)
 ├── .antigravity/                      # Antigravity (Gemini)
 │   ├── config.json
 │   ├── rules.md                       # Code-modification & workflow standards
@@ -63,7 +63,7 @@ Copy-Item -Recurse -Force ".claude\commands\*" "$env:USERPROFILE\.claude\command
 ## Configuration
 
 1. Open `.claude/CLAUDE.md` and `CLAUDE.md` and fill in every `[CUSTOMIZE]` field: name, role, domain, OS/shell, git user.
-2. Open `.claude/settings.template.json`, delete any `mcpServers` entries you don't use, rename it to `settings.json`, and set the referenced env vars — never commit literal tokens.
+2. Open `.claude/settings.template.json`, rename it to `settings.json`. It ships without an `mcpServers` block on purpose — MCP servers (GitHub, Figma, Notion, etc.) reach real external endpoints once configured with a real token, so each new environment should get a deliberately-chosen, freshly-configured set rather than inheriting whatever a previous machine had. Add only what this environment actually needs, and never commit literal tokens — reference `${ENV_VARS}` set in your shell/profile.
 3. Open `.antigravity/config.json` and confirm `project.name` and `project.domain` match your context.
 4. If GitHub Copilot isn't in your toolchain, delete `.github/copilot-instructions.md` and `.github/prompts/` — nothing else depends on them.
 5. If Antigravity isn't in your toolchain, delete `.antigravity/` — nothing else depends on it.
