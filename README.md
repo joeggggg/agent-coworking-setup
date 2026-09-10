@@ -1,6 +1,6 @@
 # Agent Co-Working Setup
 
-Multi-agent coordination layer for **Claude Code**, **GitHub Copilot**, and **Antigravity (Gemini)** working the same repo. This is the *coordination* layer — entry point, persona, environment, spec-driven workflow, and the cross-agent handoff protocol. It does not contain domain skills (BA techniques, code review, etc.) — pair it with a skills repo such as [`ba-skills`](https://github.com/joeggggg/ba-skills).
+Multi-agent coordination layer for **Claude Code**, **GitHub Copilot**, and **Antigravity (Gemini)** working the same repo. Each agent's layer targets the path that agent genuinely reads — `.claude/`, `.github/`, and `AGENTS.md` + `.agents/` respectively. This is the *coordination* layer — entry point, persona, environment, spec-driven workflow, and the cross-agent handoff protocol. It does not contain domain skills (BA techniques, code review, etc.) — pair it with a skills repo such as [`ba-skills`](https://github.com/joeggggg/ba-skills).
 
 ## Why this exists
 
@@ -25,11 +25,8 @@ agent-coworking-setup/
 │   ├── CLAUDE.md                      # Full persona — dual mode, output conventions [CUSTOMIZE]
 │   ├── commands/                      # /explain /feature /init-spec-project /quality-gate
 │   └── settings.template.json         # Plugins, model prefs (MCP servers deliberately not included — see below)
-├── .antigravity/                      # Antigravity (Gemini)
-│   ├── config.json
-│   ├── rules.md                       # Code-modification & workflow standards
-│   ├── ANTIGRAVITY.md                 # Same persona, rewired to point at .claude/
-│   └── commands/                      # Pointer files mirroring .claude/commands
+├── .agents/                           # Antigravity (Gemini) — the path it actually reads
+│   └── README.md                      # Skills/rules/plugins/hooks/MCP layout [OPTIONAL]
 ├── .github/                           # GitHub Copilot (real native config, not a placeholder)
 │   ├── copilot-instructions.md
 │   └── prompts/                       # /explain /feature /quality-gate as .prompt.md
@@ -47,7 +44,7 @@ Copy everything except this README into your project root:
 
 ```powershell
 Copy-Item -Recurse -Force "agent-coworking-setup\AGENTS.md","agent-coworking-setup\CLAUDE.md",`
-  "agent-coworking-setup\.claude","agent-coworking-setup\.antigravity",`
+  "agent-coworking-setup\.claude","agent-coworking-setup\.agents",`
   "agent-coworking-setup\.github","agent-coworking-setup\templates",`
   "agent-coworking-setup\docs" "your-project\"
 ```
@@ -59,15 +56,15 @@ Copy-Item -Force ".claude\CLAUDE.md" "$env:USERPROFILE\.claude\CLAUDE.md"
 Copy-Item -Recurse -Force ".claude\commands\*" "$env:USERPROFILE\.claude\commands\"
 ```
 
-`AGENTS.md`, `.antigravity/`, `.github/`, `templates/`, and `docs/` are project-scoped by nature (they describe *this repo's* multi-agent contract) — copy those per-project, not user-level.
+`AGENTS.md`, `.agents/`, `.github/`, `templates/`, and `docs/` are project-scoped by nature (they describe *this repo's* multi-agent contract) — copy those per-project, not user-level.
 
 ## Configuration
 
 1. Open `.claude/CLAUDE.md` and `CLAUDE.md` and fill in every `[CUSTOMIZE]` field: name, role, domain, OS/shell, git user.
 2. Open `.claude/settings.template.json`, rename it to `settings.json`. It ships without an `mcpServers` block on purpose — MCP servers (GitHub, Figma, Notion, etc.) reach real external endpoints once configured with a real token, so each new environment should get a deliberately-chosen, freshly-configured set rather than inheriting whatever a previous machine had. Add only what this environment actually needs, and never commit literal tokens — reference `${ENV_VARS}` set in your shell/profile.
-3. Open `.antigravity/config.json` and confirm `project.name` and `project.domain` match your context.
+3. Trim the `[CUSTOMIZE]` items in `AGENTS.md` § *Antigravity — agent-specific rules* (or delete the section if Antigravity isn't in your toolchain).
 4. If GitHub Copilot isn't in your toolchain, delete `.github/copilot-instructions.md` and `.github/prompts/` — nothing else depends on them.
-5. If Antigravity isn't in your toolchain, delete `.antigravity/` — nothing else depends on it.
+5. If Antigravity isn't in your toolchain, delete `.agents/` and the Antigravity section of `AGENTS.md` — nothing else depends on them.
 6. **If this workspace will be shared across machines**, read `AGENTS.md` §
    *Multi-Machine & Sync Safety* and keep `settings.json` in your **user** scope
    (`$env:USERPROFILE\.claude\`) rather than the project. See the warning below.
