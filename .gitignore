@@ -15,6 +15,15 @@ __pycache__/
 venv/
 
 # Secrets — never commit real settings, only the .template.json versions
+#
+# ⚠️ Ignoring is NOT the same as not syncing. If this workspace sits inside a
+# cloud-synced folder (Google Drive / Dropbox / OneDrive / iCloud), that client
+# replicates these files to every machine regardless of what git thinks — along
+# with any absolute paths, permission modes, or MCP endpoints inside them.
+# Machine-specific settings belong OUTSIDE the synced folder, in the user scope:
+#   $env:USERPROFILE\.claude\settings.json   (Windows)
+#   ~/.claude/settings.json                  (macOS / Linux)
+# See AGENTS.md § Multi-Machine & Sync Safety.
 .claude/settings.json
 .claude/settings.local.json
 .env

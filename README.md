@@ -34,6 +34,7 @@ agent-coworking-setup/
 │   ├── copilot-instructions.md
 │   └── prompts/                       # /explain /feature /quality-gate as .prompt.md
 ├── templates/                         # Agent-neutral BA/product deliverable scaffolds
+├── setup/machines/                    # One manifest per machine [OPTIONAL — multi-machine setups]
 └── docs/
     └── prp-protocol.md                # Cross-Agent PRP Handoff Protocol
 ```
@@ -67,6 +68,9 @@ Copy-Item -Recurse -Force ".claude\commands\*" "$env:USERPROFILE\.claude\command
 3. Open `.antigravity/config.json` and confirm `project.name` and `project.domain` match your context.
 4. If GitHub Copilot isn't in your toolchain, delete `.github/copilot-instructions.md` and `.github/prompts/` — nothing else depends on them.
 5. If Antigravity isn't in your toolchain, delete `.antigravity/` — nothing else depends on it.
+6. **If this workspace will be shared across machines**, read `AGENTS.md` §
+   *Multi-Machine & Sync Safety* and keep `settings.json` in your **user** scope
+   (`$env:USERPROFILE\.claude\`) rather than the project. See the warning below.
 
 ## The spec-driven commands
 
@@ -82,6 +86,28 @@ These are stack-agnostic — they auto-detect `package.json` scripts, `Makefile`
 ## The cross-agent handoff protocol
 
 For work that moves between agents (Claude Code interviews and authors a spec, Antigravity implements, Claude Code reviews against acceptance criteria), see [`docs/prp-protocol.md`](docs/prp-protocol.md). The PRP (Product Requirement Prompt) file is the single source of truth for the handoff; the filesystem is the evidence.
+
+## ⚠️ If your workspace lives in a cloud-synced folder
+
+Putting the workspace inside Google Drive / Dropbox / OneDrive / iCloud is a fine way to
+reach it from several machines, but it removes a boundary people assume they still have:
+
+> **`.gitignore` is not a sync boundary.** The sync client replicates everything beneath
+> the folder and never reads `.gitignore`. A gitignored `settings.json` — with its absolute
+> paths, permission modes, and MCP endpoints — still lands on every one of your machines.
+
+So there is no machine-local tier inside the workspace. Keep it this way instead:
+
+| Config | Where | Why |
+|---|---|---|
+| Portable — persona, conventions, commands, spec workflow | Workspace (`<WS>`) | Same everywhere, by design |
+| Machine-specific — permission modes, local tool paths, MCP servers, plugins | User scope (`<USER>`), outside the synced folder | Genuinely per-machine; divergence is correct |
+| Machine facts you want *documented* in the repo | `setup/machines/<MACHINE-NAME>.md`, one file per machine | Two machines never write the same file, so the sync client can't create conflict copies |
+
+And refer to roots by token (`<WS>`, `<LOCAL>`, `<USER>`) rather than by absolute path —
+each machine may mount the same cloud folder under a different drive letter.
+
+Full rules: `AGENTS.md` § *Multi-Machine & Sync Safety*.
 
 ## Related
 

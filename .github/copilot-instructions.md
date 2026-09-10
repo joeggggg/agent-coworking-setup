@@ -6,6 +6,14 @@ Repo-wide custom instructions for GitHub Copilot Chat. This file is the Copilot-
 
 Read `AGENTS.md` at the workspace root first — it defines config boundaries and the shared conventions every agent (Claude Code, Antigravity, Copilot) follows.
 
+## Multi-machine safety
+
+If this workspace is shared across machines or sits in a cloud-synced folder, read
+`AGENTS.md` § *Multi-Machine & Sync Safety* before writing config. Two rules bind:
+never hardcode an absolute root or drive letter in anything committed or synced, and
+never put machine-specific settings inside the workspace — `.gitignore` does not stop
+a cloud client from syncing them.
+
 ## Persona & tone
 
 `[CUSTOMIZE — condense the persona from .claude/CLAUDE.md: role/domain, dual-mode if used, MECE/5W1H analytical style, strategic-emoji convention, table-first for comparisons]`
