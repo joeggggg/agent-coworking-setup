@@ -1,6 +1,6 @@
 # Agent Co-Working Setup
 
-Multi-agent coordination layer for **Claude Code**, **GitHub Copilot**, and **Antigravity (Gemini)** working the same repo. Each agent's layer targets the path that agent genuinely reads — `.claude/`, `.github/`, and `AGENTS.md` + `.agents/` respectively. This is the *coordination* layer — entry point, persona, environment, spec-driven workflow, and the cross-agent handoff protocol. It does not contain domain skills (BA techniques, code review, etc.) — pair it with a skills repo such as [`ba-skills`](https://github.com/joeggggg/ba-skills).
+Multi-agent coordination layer for **Claude Code**, **GitHub Copilot**, **Antigravity (Gemini)**, and **Cursor** working the same repo. Each agent's layer targets the path that agent genuinely reads — `.claude/`, `.github/`, `AGENTS.md` + `.agents/`, and `.cursor/` respectively. This is the *coordination* layer — entry point, persona, environment, spec-driven workflow, and the cross-agent handoff protocol. It does not contain domain skills (BA techniques, code review, etc.) — pair it with a skills repo such as [`ba-skills`](https://github.com/joeggggg/ba-skills).
 
 ## Why this exists
 
@@ -27,6 +27,10 @@ agent-coworking-setup/
 │   └── settings.template.json         # Plugins, model prefs (MCP servers deliberately not included — see below)
 ├── .agents/                           # Antigravity (Gemini) — the path it actually reads
 │   └── README.md                      # Skills/rules/plugins/hooks/MCP layout [OPTIONAL]
+├── .cursor/                           # Cursor
+│   ├── README.md                      # What Cursor actually reads, and what it doesn't
+│   ├── rules/entry-point.mdc          # Always-on rule pointing at AGENTS.md
+│   └── agents/implementer.md          # Subagent for spec-driven delegation [CUSTOMIZE]
 ├── .github/                           # GitHub Copilot (real native config, not a placeholder)
 │   ├── copilot-instructions.md
 │   └── prompts/                       # /explain /feature /quality-gate as .prompt.md
@@ -45,7 +49,8 @@ Copy everything except this README into your project root:
 ```powershell
 Copy-Item -Recurse -Force "agent-coworking-setup\AGENTS.md","agent-coworking-setup\CLAUDE.md",`
   "agent-coworking-setup\.claude","agent-coworking-setup\.agents",`
-  "agent-coworking-setup\.github","agent-coworking-setup\templates",`
+  "agent-coworking-setup\.cursor","agent-coworking-setup\.github",`
+  "agent-coworking-setup\templates",`
   "agent-coworking-setup\docs" "your-project\"
 ```
 
@@ -56,7 +61,7 @@ Copy-Item -Force ".claude\CLAUDE.md" "$env:USERPROFILE\.claude\CLAUDE.md"
 Copy-Item -Recurse -Force ".claude\commands\*" "$env:USERPROFILE\.claude\commands\"
 ```
 
-`AGENTS.md`, `.agents/`, `.github/`, `templates/`, and `docs/` are project-scoped by nature (they describe *this repo's* multi-agent contract) — copy those per-project, not user-level.
+`AGENTS.md`, `.agents/`, `.cursor/`, `.github/`, `templates/`, and `docs/` are project-scoped by nature (they describe *this repo's* multi-agent contract) — copy those per-project, not user-level.
 
 ## Configuration
 
@@ -65,6 +70,7 @@ Copy-Item -Recurse -Force ".claude\commands\*" "$env:USERPROFILE\.claude\command
 3. Trim the `[CUSTOMIZE]` items in `AGENTS.md` § *Antigravity — agent-specific rules* (or delete the section if Antigravity isn't in your toolchain).
 4. If GitHub Copilot isn't in your toolchain, delete `.github/copilot-instructions.md` and `.github/prompts/` — nothing else depends on them.
 5. If Antigravity isn't in your toolchain, delete `.agents/` and the Antigravity section of `AGENTS.md` — nothing else depends on them.
+6. If Cursor isn't in your toolchain, delete `.cursor/` — nothing else depends on it. If it is, fill in the `[CUSTOMIZE]` block in `.cursor/agents/implementer.md` with your stack's test and lint commands.
 6. **If this workspace will be shared across machines**, read `AGENTS.md` §
    *Multi-Machine & Sync Safety* and keep `settings.json` in your **user** scope
    (`$env:USERPROFILE\.claude\`) rather than the project. See the warning below.
@@ -79,6 +85,27 @@ Copy-Item -Recurse -Force ".claude\commands\*" "$env:USERPROFILE\.claude\command
 | `/explain <topic>` | Structured explanation: Quick Overview → Main Content → Knowledge Reinforcement |
 
 These are stack-agnostic — they auto-detect `package.json` scripts, `Makefile` targets, or ask.
+
+## Delegating work between agents
+
+The point of four config layers is that you can hand a task to whichever agent suits it and
+have them all follow the same contract. A typical split:
+
+| Stage | Agent | Why |
+|---|---|---|
+| Interview, scope, author the spec | Claude Code | Long-context reasoning; writes the PRP |
+| Implement against the locked spec | Antigravity or Cursor | Cursor's `implementer` subagent runs in an isolated context so exploration doesn't pollute your main thread |
+| Inline edits, quick refactors | Cursor | Fastest loop for in-editor work |
+| Review delivered work vs acceptance criteria | Claude Code | Reports findings; does not silently fix |
+
+Two rules make delegation work:
+
+1. **The PRP is the contract, not the conversation.** Whatever the receiving agent needs must
+   be in the file — it does not share your chat history. See [`docs/prp-protocol.md`](docs/prp-protocol.md).
+2. **The receiving agent challenges gaps before building.** Silent reinterpretation is how a
+   handoff produces the wrong thing convincingly.
+
+Roles are defaults, not locks — any capable agent may take any role.
 
 ## The cross-agent handoff protocol
 

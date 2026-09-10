@@ -1,0 +1,26 @@
+---
+description: Entry-point pointer — read AGENTS.md and CLAUDE.md on workspace entry
+alwaysApply: true
+---
+
+# Workspace Entry
+
+This repo is shared by several AI agents, each with its own config directory.
+
+1. Read [AGENTS.md](../../AGENTS.md) first — config boundaries, shared conventions, and the cross-agent handoff protocol.
+2. Read [CLAUDE.md](../../CLAUDE.md) for environment (OS, shell, tooling) and directory layout.
+3. Read [.claude/CLAUDE.md](../../.claude/CLAUDE.md) for the persona — tone, output conventions, response style. It is shared by every agent, not just Claude Code.
+
+The persona is **not** duplicated into `.cursor/rules/`. Read it from the file above so
+there is one source of truth and no drift.
+
+## Your boundary
+
+Your config lives in `.cursor/` only. Do not modify `.claude/`, `.github/`, `.agents/`,
+`AGENTS.md`, or `CLAUDE.md` — the owner manages cross-agent alignment by hand.
+
+## Conventions
+
+Follow the Shared Output Conventions in `AGENTS.md`. In particular: Markdown by default,
+Mermaid for diagrams, plan → confirm → execute for multi-step work, and lead with the
+answer rather than a warm-up.

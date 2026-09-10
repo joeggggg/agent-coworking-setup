@@ -1,6 +1,6 @@
 # AGENTS.md — Universal Entry Point
 
-Every AI agent (Claude Code, GitHub Copilot, Antigravity, or any future companion) reads this file first on workspace entry.
+Every AI agent (Claude Code, GitHub Copilot, Antigravity, Cursor, or any future companion) reads this file first on workspace entry.
 
 ## Read Order
 
@@ -31,6 +31,7 @@ Each AI companion has an **isolated** configuration directory. Add commands, rul
 | **Claude Code** | `.claude/` | `CLAUDE.md` — persona, output conventions; `commands/` — slash commands; `settings.json` — plugins, MCP, permissions | Markdown + JSON |
 | **GitHub Copilot** | `.github/` | `copilot-instructions.md` — repo-wide custom instructions; `prompts/*.prompt.md` — reusable prompts | Markdown |
 | **Antigravity (Google DeepMind)** | **`AGENTS.md` (this file)** + `.agents/` | Rules live in this file — see § *Antigravity — agent-specific rules*; optional skills in `.agents/skills/` | Markdown |
+| **Cursor** | `.cursor/` | `rules/*.mdc` — persistent rules; `agents/*.md` — subagents; `skills/`, `commands/`, `hooks.json`, `mcp.json` | MDC + Markdown + JSON |
 
 `.claude/CLAUDE.md` and `.github/copilot-instructions.md` carry the **same persona** — keep them in sync by hand when it changes. There is no automatic bridge between agent config directories in this setup.
 
@@ -121,7 +122,7 @@ Summary:
 | Role | Default agent | Responsibility |
 |------|---------------|-----------------|
 | **Analyst / Spec author** | Claude Code | Interview the owner, clarify requirements, lock scope decisions, author the PRP |
-| **Implementer** | Antigravity (Gemini) | Review the PRP, challenge gaps before building, implement, walk through the result |
+| **Implementer** | Antigravity (Gemini) *or* Cursor | Review the PRP, challenge gaps before building, implement, walk through the result. Cursor's `implementer` subagent (`.cursor/agents/implementer.md`) is scoped for exactly this. |
 | **Final reviewer** | Claude Code | Review delivered work against the PRP's acceptance criteria; report findings, don't silently fix |
 
 Roles are defaults, not locks — any capable agent may take any role; the PRP contract is what matters.
@@ -190,7 +191,7 @@ Sourced from `.claude/CLAUDE.md` — do not diverge across agents:
 ## Do Not
 
 - Modify another agent's config directory
-- Cross-contaminate rules between `.claude/`, `.github/`, and this file's Antigravity section
+- Cross-contaminate rules between `.claude/`, `.github/`, `.cursor/`, `.agents/`, and this file's Antigravity section
 - Commit or push to git unless explicitly asked
 - Hardcode an absolute root or drive letter in anything synced or committed — use the
   path tokens in *Multi-Machine & Sync Safety*
